@@ -311,6 +311,92 @@
       return { numbers: fallback, hint: findSolution(fallback) };
     }
 
+    // ===== UI描画 =====
+
+    function renderTicket() {
+      document.getElementById('ticketNo').textContent = 'NO. ' + state.numbers.join('');
+      document.getElementById('ticketNumbers').innerHTML =
+        state.numbers.map((n, i) =>
+          `<div class="num-card ${COLORS[i]}">${n}</div>`
+        ).join('');
+    }
+
+    function renderNumButtons() {
+      document.getElementById('numButtons').innerHTML =
+        state.numbers.map((n, i) => {
+          const used     = state.usedIndices.has(i);
+          const inactive = !used && state.phase !== 'num';
+          return `<button class="btn-num ${COLORS[i]} ${used ? 'used' : ''} ${inactive ? 'inactive' : ''}"
+            data-idx="${i}">${n}</button>`;
+        }).join('');
+    }
+
+    function renderOpButtons() {
+      const inactive = state.phase !== 'op';
+      document.getElementById('opButtons').innerHTML =
+        OPERATORS.map(op =>
+          `<button class="btn-op ${inactive ? 'inactive' : ''}" data-op="${op}">${op}</button>`
+        ).join('');
+    }
+
+    function renderFormula() {
+      const display = document.getElementById('formulaDisplay');
+      if (state.formula.length === 0) {
+        display.innerHTML = '<span class="f-blank">しきをつくってね…</span>';
+        return;
+      }
+
+      const nums = state.formula.filter(f => f.type === 'num').map(f => f.value);
+      const ops  = state.formula.filter(f => f.type === 'op').map(f => f.value);
+
+      let html = state.formula.map(item => {
+        if (item.type === 'num') {
+          return `<span class="f-num ${COLORS[item.colorIdx]}">${item.value}</span>`;
+        }
+        return `<span class="f-op">${item.value}</span>`;
+      }).join('');
+
+      // 現在の計算途中の結果を表示
+      if (nums.length >= 2 && ops.length >= 1) {
+        const r = evalFormula(nums, ops);
+        if (r !== null) {
+          const disp = Number.isInteger(r) ? r : r.toFixed(2);
+          html += `<span class="f-result">＝${disp}</span>`;
+        }
+      }
+
+      display.innerHTML = html;
+    }
+
+    function renderCheckBtn() {
+      document.getElementById('checkBtn').disabled =
+        state.formula.length < 7 || state.solved;
+    }
+
+    function render() {
+      renderTicket();
+      renderNumButtons();
+      renderOpButtons();
+      renderFormula();
+      renderCheckBtn();
+    }
+
+    // ===== 初期化 =====
+    function startNewProblem() {
+      const { numbers, hint } = generateProblem();
+      state.numbers     = numbers;
+      state.hint        = hint;
+      state.formula     = [];
+      state.usedIndices = new Set();
+      state.phase       = 'num';
+      state.solved      = false;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className   = 'feedback';
+      document.getElementById('nextBtn').classList.remove('show');
+      render();
+    }
+
+    startNewProblem();
   </script>
 </body>
 </html>
