@@ -41,7 +41,7 @@
       font-size: 1.2rem; font-weight: 900;
       color: #ffd93d; letter-spacing: 3px; margin-top: 4px;
     }
-    .header p { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+    .header p { font-size: 0.9rem; color: #ffd93d; font-weight: 900; margin-top: 6px; letter-spacing: 1px; }
     .mute-btn {
       position: absolute; top: 10px; right: 12px;
       background: none; border: 1px solid #555; border-radius: 50%;
@@ -75,14 +75,14 @@
     }
     .ticket-numbers { display: flex; justify-content: center; gap: 6px; }
     .num-card {
-      border-radius: 8px; padding: 10px 12px;
-      font-size: 2rem; font-weight: 900;
-      min-width: 52px; text-align: center;
+      border-radius: 8px; padding: 6px 8px;
+      font-size: 1.4rem; font-weight: 900;
+      min-width: 44px; text-align: center;
     }
-    .color-0 { background: #e03030; color: #fff; box-shadow: 0 3px 0 #a02020; }
-    .color-1 { background: #ffd93d; color: #333; box-shadow: 0 3px 0 #f0a500; }
-    .color-2 { background: #2e8b3a; color: #fff; box-shadow: 0 3px 0 #1a5e26; }
-    .color-3 { background: #1a6edc; color: #fff; box-shadow: 0 3px 0 #0e4ea0; }
+    .color-0 { background: #c8a96e; color: #2c1810; box-shadow: 0 3px 0 #8b6914; }
+    .color-1 { background: #c8a96e; color: #2c1810; box-shadow: 0 3px 0 #8b6914; }
+    .color-2 { background: #c8a96e; color: #2c1810; box-shadow: 0 3px 0 #8b6914; }
+    .color-3 { background: #c8a96e; color: #2c1810; box-shadow: 0 3px 0 #8b6914; }
     .tear-line { border-bottom: 2px dashed #b8860b; margin: 10px 0 0; }
 
     /* 式表示エリア */
@@ -100,10 +100,10 @@
       border-radius: 4px; padding: 2px 8px;
       font-size: 1.4rem; font-weight: 900;
     }
-    .f-num.color-0 { color: #fff; }
-    .f-num.color-1 { color: #333; }
-    .f-num.color-2 { color: #fff; }
-    .f-num.color-3 { color: #fff; }
+    .f-num.color-0 { color: #2c1810; }
+    .f-num.color-1 { color: #2c1810; }
+    .f-num.color-2 { color: #2c1810; }
+    .f-num.color-3 { color: #2c1810; }
     .f-op  { font-size: 1.2rem; font-weight: 700; color: #555; }
     .f-blank { font-size: 0.9rem; color: #bbb; }
     .f-result { font-size: 1rem; font-weight: 900; color: #333; margin-left: 4px; }
@@ -114,7 +114,17 @@
       min-height: 26px; margin: 0 14px 6px; padding: 4px 8px;
       border-radius: 6px; line-height: 1.4;
     }
-    .feedback.correct { background: #e8f5e9; color: #2e7d32; }
+    @keyframes celebrate-pop {
+      0%   { transform: scale(0.7); opacity: 0; }
+      60%  { transform: scale(1.1); }
+      100% { transform: scale(1);   opacity: 1; }
+    }
+    @keyframes game-flash {
+      0%,100% { box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+      40%     { box-shadow: 0 0 0 6px #ffd93d, 0 8px 48px rgba(255,217,61,0.6); }
+    }
+    .game.celebrating { animation: game-flash 0.7s ease-out; }
+    .feedback.correct { background: #e8f5e9; color: #2e7d32; font-size: 1.1rem; padding: 10px 8px; animation: celebrate-pop 0.4s ease-out; }
     .feedback.wrong   { background: #ffebee; color: #c62828; }
 
     /* 数字ボタン */
@@ -125,9 +135,9 @@
     }
     .btn-row { display: flex; gap: 5px; justify-content: center; }
     .btn-num {
-      border-radius: 8px; padding: 8px 12px;
-      font-size: 1.3rem; font-weight: 900;
-      min-width: 52px; min-height: 44px; text-align: center;
+      border-radius: 8px; padding: 12px 0;
+      font-size: 1.7rem; font-weight: 900;
+      min-width: 66px; min-height: 60px; text-align: center;
       border: none; cursor: pointer; font-family: inherit;
       transition: transform 0.1s;
     }
@@ -137,15 +147,15 @@
 
     /* 記号ボタン */
     .btn-op {
-      background: #1a1a2e; color: #ffd93d;
-      border-radius: 8px; padding: 8px 12px;
-      font-size: 1.2rem; font-weight: 900;
-      min-width: 52px; min-height: 44px; text-align: center;
+      background: #ffd93d; color: #1a1a2e;
+      border-radius: 8px; padding: 12px 0;
+      font-size: 1.7rem; font-weight: 900;
+      min-width: 66px; min-height: 60px; text-align: center;
       border: none; cursor: pointer; font-family: inherit;
       transition: transform 0.1s;
     }
     .btn-op:active   { transform: scale(0.9); }
-    .btn-op.inactive { opacity: 0.3; pointer-events: none; }
+    .btn-op.inactive { background: #d4ccc0; color: #aaa; opacity: 1; pointer-events: none; }
 
     /* アクションボタン行 */
     .action-row { margin: 4px 14px 14px; display: flex; gap: 6px; }
@@ -197,7 +207,7 @@
       <div class="header-stripe"></div>
       <button class="mute-btn" id="muteBtn">🔊</button>
       <h1>🎫 10つくり</h1>
-      <p>4つのかずで「10」をつくろう！</p>
+      <p>4つの数で「10」をつくろう！</p>
     </div>
 
     <div class="ticket-area">
@@ -220,12 +230,12 @@
     <div class="feedback" id="feedback"></div>
 
     <div class="input-section">
-      <div class="section-label">かずを えらぼう 👇</div>
+      <div class="section-label">数を えらぼう 👇</div>
       <div class="btn-row" id="numButtons"><!-- JS が描画 --></div>
     </div>
 
     <div class="input-section" style="margin-top:6px;">
-      <div class="section-label">きごうを えらぼう 👇</div>
+      <div class="section-label">記号を えらぼう 👇</div>
       <div class="btn-row" id="opButtons"><!-- JS が描画 --></div>
     </div>
 
@@ -520,15 +530,22 @@
 
       const fb = document.getElementById('feedback');
       if (result !== null && Math.abs(result - 10) < 0.001) {
-        fb.textContent = '🎉 せいかい！ すごい！';
+        fb.textContent = '🎊 正解！ すごい！ 🎊';
         fb.className   = 'feedback correct';
         state.solved   = true;
         playCorrect();
+        const game = document.querySelector('.game');
+        game.classList.remove('celebrating');
+        void game.offsetWidth;
+        game.classList.add('celebrating');
         document.getElementById('nextBtn').classList.add('show');
       } else {
         const disp = result === null ? '？' : (Number.isInteger(result) ? result : result.toFixed(2));
-        fb.textContent = `ちがうよ！（いまのこたえ: ${disp}）もう一度！`;
+        const h = state.hint;
+        const example = h ? `${h.nums[0]}${h.ops[0]}${h.nums[1]}${h.ops[1]}${h.nums[2]}${h.ops[2]}${h.nums[3]}=10` : '';
+        fb.innerHTML = `ざんねん！（こたえ: ${disp}）<br><span style="font-size:0.8em">れい: ${example}</span>`;
         fb.className   = 'feedback wrong';
+        document.getElementById('nextBtn').classList.add('show');
         playWrong();
       }
       render();
