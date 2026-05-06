@@ -424,6 +424,36 @@
       render();
     }
 
+    // ===== 答え合わせ・ヒント =====
+
+    function checkAnswer() {
+      if (state.formula.length < 7) return;
+      const nums = state.formula.filter(f => f.type === 'num').map(f => f.value);
+      const ops  = state.formula.filter(f => f.type === 'op').map(f => f.value);
+      const result = evalFormula(nums, ops);
+
+      const fb = document.getElementById('feedback');
+      if (result !== null && Math.abs(result - 10) < 0.001) {
+        fb.textContent = '🎉 せいかい！ すごい！';
+        fb.className   = 'feedback correct';
+        state.solved   = true;
+        document.getElementById('nextBtn').classList.add('show');
+      } else {
+        const disp = result === null ? '？' : (Number.isInteger(result) ? result : result.toFixed(2));
+        fb.textContent = `ちがうよ！（いまのこたえ: ${disp}）もう一度！`;
+        fb.className   = 'feedback wrong';
+      }
+      render();
+    }
+
+    function showHint() {
+      if (!state.hint) return;
+      const { nums, ops } = state.hint;
+      const fb = document.getElementById('feedback');
+      fb.textContent = `💡 ヒント：「${nums[0]} ${ops[0]}」からはじめよう！`;
+      fb.className   = 'feedback';
+    }
+
     // イベント委任でボタンを配線
     document.getElementById('numButtons').addEventListener('click', e => {
       const btn = e.target.closest('[data-idx]');
@@ -437,6 +467,8 @@
 
     document.getElementById('resetBtn').addEventListener('click', reset);
     document.getElementById('nextBtn').addEventListener('click', startNewProblem);
+    document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+    document.getElementById('hintBtn').addEventListener('click', showHint);
 
     startNewProblem();
   </script>
