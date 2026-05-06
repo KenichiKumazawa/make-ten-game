@@ -239,7 +239,79 @@
   </div>
 
   <script>
-    // Task 2 以降で追加
+    // ===== 定数 =====
+    const OPERATORS = ['+', '-', '×', '÷'];
+    const COLORS    = ['color-0', 'color-1', 'color-2', 'color-3'];
+
+    // ===== ゲーム状態 =====
+    const state = {
+      numbers:     [],          // e.g. [3, 1, 4, 2]
+      formula:     [],          // [{type:'num', value:3, colorIdx:0}, {type:'op', value:'+'}, ...]
+      usedIndices: new Set(),   // 使用済み数字のインデックス
+      hint:        null,        // {nums:[...], ops:[...]} 解の1つ
+      phase:       'num',       // 'num' | 'op' | 'done'
+      solved:      false,
+      muted:       false,
+    };
+
+    // ===== 問題生成 =====
+
+    // 配列の全並び替えを返す
+    function permutations(arr) {
+      if (arr.length <= 1) return [arr.slice()];
+      return arr.flatMap((v, i) => {
+        const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
+        return permutations(rest).map(p => [v, ...p]);
+      });
+    }
+
+    // 1回の演算（÷0 は null を返す）
+    function applyOp(a, op, b) {
+      if (op === '+') return a + b;
+      if (op === '-') return a - b;
+      if (op === '×') return a * b;
+      if (op === '÷') return b === 0 ? null : a / b;
+    }
+
+    // 左から順に計算（括弧なし）
+    function evalFormula(nums, ops) {
+      let result = nums[0];
+      for (let i = 0; i < ops.length; i++) {
+        result = applyOp(result, ops[i], nums[i + 1]);
+        if (result === null) return null;
+      }
+      return result;
+    }
+
+    // 4数字で10が作れるか総当たりで探す。解があれば {nums, ops} を返す
+    function findSolution(numbers) {
+      for (const perm of permutations(numbers)) {
+        for (const op1 of OPERATORS)
+        for (const op2 of OPERATORS)
+        for (const op3 of OPERATORS) {
+          const result = evalFormula(perm, [op1, op2, op3]);
+          if (result !== null && Math.abs(result - 10) < 0.001) {
+            return { nums: perm.slice(), ops: [op1, op2, op3] };
+          }
+        }
+      }
+      return null;
+    }
+
+    // 解ける問題を1つ生成して返す
+    function generateProblem() {
+      for (let attempt = 0; attempt < 100; attempt++) {
+        const nums = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10));
+        const solution = findSolution(nums);
+        if (solution) return { numbers: nums, hint: solution };
+      }
+      // フォールバック（必ず解ける問題）
+      const fallback = [1, 2, 3, 4];
+      return { numbers: fallback, hint: findSolution(fallback) };
+    }
+
+    // 動作確認用（コンソールで確認する）
+    console.log('問題生成テスト:', generateProblem());
   </script>
 </body>
 </html>
