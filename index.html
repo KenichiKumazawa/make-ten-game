@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🎫 10つくり</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -45,7 +45,7 @@
     .mute-btn {
       position: absolute; top: 10px; right: 12px;
       background: none; border: 1px solid #555; border-radius: 50%;
-      width: 28px; height: 28px; color: #aaa; font-size: 0.8rem;
+      width: 36px; height: 36px; color: #aaa; font-size: 0.8rem;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
 
@@ -70,7 +70,7 @@
       border: 2px solid rgba(220,50,50,0.15); border-radius: 4px; padding: 2px 4px;
     }
     .ticket-label {
-      font-size: 0.6rem; font-weight: 700; color: #888;
+      font-size: 0.6rem; font-weight: 700; color: #555;
       letter-spacing: 3px; margin-bottom: 8px;
     }
     .ticket-numbers { display: flex; justify-content: center; gap: 6px; }
@@ -79,10 +79,10 @@
       font-size: 2rem; font-weight: 900;
       min-width: 52px; text-align: center;
     }
-    .color-0 { background: #ff6b6b; color: #fff; box-shadow: 0 3px 0 #c0392b; }
+    .color-0 { background: #e03030; color: #fff; box-shadow: 0 3px 0 #a02020; }
     .color-1 { background: #ffd93d; color: #333; box-shadow: 0 3px 0 #f0a500; }
-    .color-2 { background: #6bcb77; color: #fff; box-shadow: 0 3px 0 #3a9a4a; }
-    .color-3 { background: #4d96ff; color: #fff; box-shadow: 0 3px 0 #1a66cc; }
+    .color-2 { background: #2e8b3a; color: #fff; box-shadow: 0 3px 0 #1a5e26; }
+    .color-3 { background: #1a6edc; color: #fff; box-shadow: 0 3px 0 #0e4ea0; }
     .tear-line { border-bottom: 2px dashed #b8860b; margin: 10px 0 0; }
 
     /* 式表示エリア */
@@ -100,8 +100,10 @@
       border-radius: 4px; padding: 2px 8px;
       font-size: 1.4rem; font-weight: 900;
     }
+    .f-num.color-0 { color: #fff; }
     .f-num.color-1 { color: #333; }
-    .f-num:not(.color-1) { color: #fff; }
+    .f-num.color-2 { color: #fff; }
+    .f-num.color-3 { color: #fff; }
     .f-op  { font-size: 1.2rem; font-weight: 700; color: #555; }
     .f-blank { font-size: 0.9rem; color: #bbb; }
     .f-result { font-size: 1rem; font-weight: 900; color: #333; margin-left: 4px; }
@@ -125,7 +127,7 @@
     .btn-num {
       border-radius: 8px; padding: 8px 12px;
       font-size: 1.3rem; font-weight: 900;
-      min-width: 52px; text-align: center;
+      min-width: 52px; min-height: 44px; text-align: center;
       border: none; cursor: pointer; font-family: inherit;
       transition: transform 0.1s;
     }
@@ -138,7 +140,7 @@
       background: #1a1a2e; color: #ffd93d;
       border-radius: 8px; padding: 8px 12px;
       font-size: 1.2rem; font-weight: 900;
-      min-width: 52px; text-align: center;
+      min-width: 52px; min-height: 44px; text-align: center;
       border: none; cursor: pointer; font-family: inherit;
       transition: transform 0.1s;
     }
@@ -152,19 +154,24 @@
       border: 1px solid #c8a96e; border-radius: 8px;
       padding: 9px 4px; font-size: 0.7rem; font-weight: 700;
       cursor: pointer; font-family: inherit;
+      min-height: 44px; transition: transform 0.1s;
     }
     .btn-hint {
       flex: 1; background: #fff3cd; color: #8b6914;
       border: 1px solid #f0c800; border-radius: 8px;
       padding: 9px 4px; font-size: 0.7rem; font-weight: 700;
       cursor: pointer; font-family: inherit;
+      min-height: 44px; transition: transform 0.1s;
     }
     .btn-check {
       flex: 2; background: #1a1a2e; color: #ffd93d;
       border: none; border-radius: 8px;
       padding: 9px 4px; font-size: 0.75rem; font-weight: 900;
       cursor: pointer; font-family: inherit;
+      min-height: 44px; transition: transform 0.1s;
     }
+    .btn-reset:active, .btn-hint:active, .btn-check:active { transform: scale(0.95); }
+    button:focus-visible { outline: 3px solid #ffd93d; outline-offset: 2px; }
     .btn-check:disabled { opacity: 0.35; pointer-events: none; }
 
     /* つぎへボタン */
