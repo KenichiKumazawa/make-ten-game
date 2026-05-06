@@ -271,6 +271,7 @@
       if (op === '-') return a - b;
       if (op === '×') return a * b;
       if (op === '÷') return b === 0 ? null : a / b;
+      return null;
     }
 
     // 左から順に計算（括弧なし）
@@ -310,8 +311,6 @@
       return { numbers: fallback, hint: findSolution(fallback) };
     }
 
-    // 動作確認用（コンソールで確認する）
-    console.log('問題生成テスト:', generateProblem());
   </script>
 </body>
 </html>
