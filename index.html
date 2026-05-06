@@ -396,6 +396,48 @@
       render();
     }
 
+    // ===== 入力処理 =====
+
+    function selectNumber(idx) {
+      if (state.phase !== 'num' || state.usedIndices.has(idx) || state.solved) return;
+      state.formula.push({ type: 'num', value: state.numbers[idx], colorIdx: idx });
+      state.usedIndices.add(idx);
+      state.phase = state.usedIndices.size === 4 ? 'done' : 'op';
+      render();
+    }
+
+    function selectOperator(op) {
+      if (state.phase !== 'op' || state.solved) return;
+      state.formula.push({ type: 'op', value: op });
+      state.phase = 'num';
+      render();
+    }
+
+    function reset() {
+      state.formula     = [];
+      state.usedIndices = new Set();
+      state.phase       = 'num';
+      state.solved      = false;
+      document.getElementById('feedback').textContent = '';
+      document.getElementById('feedback').className   = 'feedback';
+      document.getElementById('nextBtn').classList.remove('show');
+      render();
+    }
+
+    // イベント委任でボタンを配線
+    document.getElementById('numButtons').addEventListener('click', e => {
+      const btn = e.target.closest('[data-idx]');
+      if (btn) selectNumber(Number(btn.dataset.idx));
+    });
+
+    document.getElementById('opButtons').addEventListener('click', e => {
+      const btn = e.target.closest('[data-op]');
+      if (btn) selectOperator(btn.dataset.op);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', reset);
+    document.getElementById('nextBtn').addEventListener('click', startNewProblem);
+
     startNewProblem();
   </script>
 </body>
