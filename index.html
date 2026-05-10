@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>10つくり</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --col-a: #ff8fa3;
+      --col-b: #ffd166;
+      --col-c: #06d6a0;
+      --col-d: #4cc9f0;
+      --col-op: #b388eb;
+      --cream: #fff8e7;
+      --ink: #2b2d42;
+    }
+
+    body {
+      font-family: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', sans-serif;
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 390px;
+      background: var(--cream);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--ink);
+      padding: 16px 16px 14px;
+      position: relative;
+    }
+    .header-stripe {
+      position: absolute; top: 0; left: 0; right: 0; height: 6px;
+      background: linear-gradient(90deg, var(--col-a), var(--col-b), var(--col-c), var(--col-d), var(--col-op));
+    }
+    .header-inner {
+      display: flex; align-items: center; gap: 12px; margin-top: 4px;
+    }
+    .title-block { flex: 1; }
+    .game-title {
+      font-size: 24px; font-weight: 900; color: var(--col-b); letter-spacing: 1px; line-height: 1;
+    }
+    .game-sub {
+      font-size: 10px; color: rgba(255,255,255,0.6); letter-spacing: 2px; margin-top: 3px;
+    }
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .mute-btn {
+      background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 50%;
+      width: 32px; height: 32px; color: rgba(255,255,255,0.7); font-size: 13px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .stars { display: flex; gap: 3px; }
+    .star {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; transition: all 250ms;
+    }
+    .star.lit {
+      background: var(--col-b);
+      border-color: var(--col-b);
+      box-shadow: 0 0 8px var(--col-b);
+    }
+
+    /* DIFFICULTY */
+    .diff-row {
+      display: flex; gap: 6px; padding: 12px 14px 4px;
+    }
+    .diff-btn {
+      flex: 1; padding: 8px 4px; border-radius: 999px; cursor: pointer; font-family: inherit;
+      font-size: 12px; font-weight: 800; transition: all 120ms; border: 2.5px solid var(--ink);
+      background: #fff; color: var(--ink);
+    }
+    .diff-btn.active { color: #fff; box-shadow: 0 3px 0 var(--ink); transform: translateY(-1px); }
+    .diff-btn.active.easy   { background: var(--col-c); border-color: var(--col-c); }
+    .diff-btn.active.normal { background: var(--col-d); border-color: var(--col-d); }
+    .diff-btn.active.hard   { background: var(--col-a); border-color: var(--col-a); }
+
+    /* TICKET — 昭和硬券モチーフ */
+    .ticket-wrap {
+      margin: 10px 28px 0;
+      filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.28));
+    }
+    .ticket {
+      background: #f2dba8;
+      border-radius: 4px 4px 0 0;
+      border: 3px solid #111;
+      display: flex;
+      height: 108px;
+      overflow: hidden;
+      color: #111;
+      position: relative;
+      clip-path: path('M 0 0 L 400 0 L 400 108 L 204 108 Q 167 93 130 108 L 0 108 Z');
+    }
+    .ticket-left {
+      width: 24px;
+      border-right: 2px solid rgba(0,0,0,0.2);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 6px 0; gap: 2px;
+    }
+    .ticket-left-label {
+      writing-mode: vertical-rl;
+      font-size: 6px; font-weight: 900; letter-spacing: 2px; opacity: 0.4;
+    }
+    .ticket-left-box {
+      width: 10px; height: 10px;
+      border: 2px solid rgba(0,0,0,0.45); margin-bottom: 4px;
+    }
+    .ticket-main {
+      flex: 1; padding: 6px 6px 5px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .ticket-barcode { display: flex; gap: 2px; margin-bottom: 1px; }
+    .ticket-bar { width: 6px; height: 6px; background: #111; }
+    .ticket-body {
+      display: flex; align-items: center; gap: 5px; flex: 1;
+    }
+    .ticket-station-box {
+      border: 2px solid #111;
+      padding: 1px 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ticket-station-name { font-size: 16px; font-weight: 900; line-height: 1.1; letter-spacing: -1px; }
+    .ticket-arrow-icon { font-size: 11px; color: #111; flex-shrink: 0; }
+    .ticket-fare { flex: 1; }
+    .ticket-fare-line { font-size: 8px; font-weight: 700; opacity: 0.55; }
+    .ticket-fare-amount {
+      font-size: 20px; font-weight: 900; line-height: 1;
+      display: flex; align-items: flex-start; gap: 1px;
+    }
+    .ticket-fare-unit {
+      font-size: 8px; font-weight: 900; margin-top: 3px;
+      display: flex; flex-direction: column;
+    }
+    .ticket-fare-child { font-size: 7px; font-weight: 700; opacity: 0.6; margin-top: 1px; }
+    .ticket-footer { font-size: 6.5px; font-weight: 700; opacity: 0.45; letter-spacing: 0.3px; }
+    .ticket-right {
+      width: 32px;
+      border-left: 2px dashed rgba(0,0,0,0.18);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 4px 0;
+    }
+    .num-card {
+      width: 100%; text-align: center;
+      font-size: 17px; font-weight: 900;
+      line-height: 1.2; color: #111;
+      transition: opacity 200ms; background: transparent;
+    }
+    .num-card.used { opacity: 0.13; }
+
+    /* 5連続お祝いオーバーレイ */
+    .celebrate-overlay {
+      position: absolute; inset: 0; z-index: 20;
+      background: rgba(27,27,46,0.88);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px;
+      border-radius: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 250ms;
+    }
+    .celebrate-overlay.show { opacity: 1; pointer-events: auto; }
+    .celebrate-emoji {
+      font-size: 64px;
+      animation: emoji-bounce 0.6s ease-out;
+    }
+    .celebrate-msg {
+      font-size: 28px; font-weight: 900; color: #fff;
+      text-align: center; line-height: 1.3;
+      animation: msg-pop 0.5s 0.15s ease-out both;
+    }
+    .celebrate-sub {
+      font-size: 14px; color: rgba(255,255,255,0.7);
+      font-weight: 700;
+      animation: msg-pop 0.5s 0.25s ease-out both;
+    }
+    .celebrate-btn {
+      margin-top: 8px; padding: 12px 32px; border-radius: 999px;
+      background: var(--col-b); color: var(--ink); border: none;
+      font-size: 16px; font-weight: 900; font-family: inherit;
+      cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+      animation: msg-pop 0.5s 0.35s ease-out both;
+    }
+    @keyframes emoji-bounce {
+      0%  { transform: scale(0) rotate(-20deg); }
+      60% { transform: scale(1.2) rotate(5deg); }
+      100%{ transform: scale(1) rotate(0); }
+    }
+    @keyframes msg-pop {
+      from { transform: translateY(16px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+
+    /* FORMULA */
+    .formula-area {
+      margin: 12px 16px 0;
+      background: #fff;
+      border-radius: 14px;
+      border: 2.5px dashed rgba(43,45,66,0.25);
+      padding: 10px 12px;
+      min-height: 54px;
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 4px;
+    }
+    .f-placeholder { font-size: 12px; color: var(--ink); opacity: 0.35; font-weight: 700; }
+    .f-num { font-size: 26px; font-weight: 900; -webkit-text-stroke: 1.5px var(--ink); }
+    .f-num.c0 { color: var(--col-a); }
+    .f-num.c1 { color: var(--col-b); }
+    .f-num.c2 { color: var(--col-c); }
+    .f-num.c3 { color: var(--col-d); }
+    .f-op     { font-size: 22px; font-weight: 900; color: var(--col-op); -webkit-text-stroke: 1px var(--ink); }
+    .f-result { font-size: 17px; font-weight: 800; color: var(--ink); margin-left: 4px; opacity: 0.7; }
+
+    /* FEEDBACK */
+    .feedback {
+      min-height: 32px; margin: 8px 16px 0;
+      text-align: center; font-size: 16px; font-weight: 900;
+    }
+    .feedback.correct { color: var(--col-c); animation: fb-pop 0.5s ease-out; }
+    .feedback.wrong   { color: var(--col-a); animation: fb-shake 0.4s ease-out; }
+    .feedback.hint    { color: var(--col-op); font-size: 12px; font-weight: 700; }
+
+    @keyframes fb-pop {
+      0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+      55%  { transform: scale(1.25) rotate(4deg); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes fb-shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-7px); }
+      75% { transform: translateX(7px); }
+    }
+
+    /* BUTTONS */
+    .section-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 3px;
+      color: var(--ink); opacity: 0.45; text-align: center; margin-bottom: 6px;
+    }
+    .input-section { margin: 10px 16px 0; }
+    .btn-row { display: flex; gap: 6px; justify-content: center; }
+
+    .btn-num {
+      width: 66px; height: 56px; border-radius: 14px;
+      border: 3px solid var(--ink); font-size: 26px; font-weight: 900;
+      color: var(--ink); font-family: inherit; cursor: pointer;
+      transition: transform 80ms, box-shadow 80ms, opacity 120ms;
+      box-shadow: 0 4px 0 var(--ink);
+    }
+    .btn-num:active    { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+    .btn-num:disabled  { opacity: 0.2; box-shadow: none; cursor: not-allowed; transform: none; }
+    .btn-num.c0 { background: var(--col-a); }
+    .btn-num.c1 { background: var(--col-b); }
+    .btn-num.c2 { background: var(--col-c); }
+    .btn-num.c3 { background: var(--col-d); }
+
+    .btn-op {
+      width: 66px; height: 56px; border-radius: 14px;
+      background: var(--col-op); border: 3px solid var(--ink);
+      font-size: 24px; font-weight: 900; color: #fff; font-family: inherit;
+      cursor: pointer; transition: transform 80ms, box-shadow 80ms, opacity 120ms;
+      box-shadow: 0 4px 0 var(--ink);
+    }
+    .btn-op:active   { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+    .btn-op:disabled { opacity: 0.25; box-shadow: none; cursor: not-allowed; transform: none; }
+
+    /* ACTION ROW */
+    .action-row {
+      display: flex; gap: 6px; padding: 14px 14px 16px; margin-top: 4px;
+    }
+    .btn-reset, .btn-hint, .btn-check, .btn-next {
+      flex: 1; border-radius: 12px; font-family: inherit;
+      font-weight: 900; cursor: pointer; min-height: 48px;
+      transition: transform 80ms, box-shadow 80ms;
+      border: 2.5px solid var(--ink); font-size: 12px;
+    }
+    .btn-reset, .btn-hint { background: #fff; color: var(--ink); box-shadow: 0 3px 0 var(--ink); }
+    .btn-check { flex: 2; background: var(--ink); color: var(--col-b); font-size: 14px; box-shadow: 0 3px 0 #000; }
+    .btn-next  { flex: 2; background: var(--col-c); color: #fff; font-size: 14px; box-shadow: 0 3px 0 var(--ink); animation: pulse 1s ease-in-out infinite; display: none; }
+    .btn-next.show { display: block; }
+    .btn-check:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
+    .btn-reset:active, .btn-hint:active, .btn-check:active, .btn-next:active {
+      transform: translateY(2px); box-shadow: 0 1px 0 var(--ink);
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%      { transform: scale(1.03); }
+    }
+    @keyframes game-flash {
+      0%,100% { box-shadow: 0 12px 48px rgba(0,0,0,0.6); }
+      35% { box-shadow: 0 0 0 6px var(--col-b), 0 12px 64px rgba(255,209,102,0.5); }
+    }
+    .game.celebrating { animation: game-flash 0.7s ease-out; }
+
+    /* CONFETTI */
+    .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+    .confetti-piece { position: absolute; top: -10px; border-radius: 2px; }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(950px) rotate(720deg); opacity: 0.5; }
+    }
+
+    /* MASCOT */
+    .mascot-face { width: 44px; height: 44px; position: relative; flex-shrink: 0; }
+    .mascot-body {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: var(--col-b); border: 3px solid var(--ink);
+      transition: transform 200ms;
+    }
+    .mascot-eye   { position: absolute; width: 5px; background: var(--ink); border-radius: 50%; transition: height 200ms; }
+    .mascot-cheek { position: absolute; width: 7px; height: 5px; border-radius: 50%; background: var(--col-a); opacity: 0.75; }
+    .mascot-mouth { position: absolute; background: var(--ink); border-radius: 0 0 8px 8px; transition: all 200ms; }
+  </style>
+</head>
+<body>
+  <div class="game" id="game">
+    <div class="header">
+      <div class="header-stripe"></div>
+      <div class="header-inner">
+        <!-- マスコット マルくん -->
+        <div class="mascot-face" id="mascotFace">
+          <div class="mascot-body" id="mascotBody"></div>
+          <div class="mascot-eye" id="eyeL" style="top:15px;left:11px;height:5px;"></div>
+          <div class="mascot-eye" id="eyeR" style="top:15px;right:11px;height:5px;"></div>
+          <div class="mascot-cheek" style="top:23px;left:4px;"></div>
+          <div class="mascot-cheek" style="top:23px;right:4px;"></div>
+          <div class="mascot-mouth" id="mouth" style="width:12px;height:6px;top:27px;left:16px;"></div>
+        </div>
+        <div class="title-block">
+          <div class="game-title">10つくり</div>
+          <div class="game-sub">4つの数で10をつくろう！</div>
+        </div>
+        <div class="header-right">
+          <button class="mute-btn" id="muteBtn">🔊</button>
+          <div class="stars" id="stars">
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+            <div class="star"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 難易度 -->
+    <div class="diff-row">
+      <button class="diff-btn easy active" data-diff="easy">やさしい</button>
+      <button class="diff-btn normal"      data-diff="normal">ふつう</button>
+      <button class="diff-btn hard"        data-diff="hard">むずかしい</button>
+    </div>
+
+    <!-- 切符（昭和硬券モチーフ） -->
+    <div class="ticket-wrap">
+      <div class="ticket">
+        <!-- 左端 -->
+        <div class="ticket-left">
+          <div class="ticket-left-box"></div>
+          <div class="ticket-left-label">XX-XX.XX</div>
+        </div>
+        <!-- メイン -->
+        <div class="ticket-main">
+          <div class="ticket-barcode">
+            <div class="ticket-bar"></div><div class="ticket-bar"></div>
+            <div class="ticket-bar"></div><div class="ticket-bar"></div>
+            <div class="ticket-bar"></div><div class="ticket-bar"></div>
+          </div>
+          <div class="ticket-body">
+            <div class="ticket-station-box">
+              <div class="ticket-station-name">じゅう<br>づくり</div>
+            </div>
+            <div class="ticket-arrow-icon">▶</div>
+            <div class="ticket-fare">
+              <div class="ticket-fare-line">○○会社線</div>
+              <div class="ticket-fare-amount">
+                10
+                <div class="ticket-fare-unit"><span>円</span><span>区間</span></div>
+              </div>
+              <div class="ticket-fare-child">小児 5 円</div>
+            </div>
+          </div>
+          <div class="ticket-footer">発券当日限り有効　下車前途無効</div>
+        </div>
+        <!-- 右端：問題の数字 -->
+        <div class="ticket-right" id="ticketNumbers"></div>
+      </div>
+    </div>
+
+    <!-- 数字ボタン -->
+    <div class="input-section">
+      <div class="section-label">① すうじをえらぼう</div>
+      <div class="btn-row" id="numButtons"></div>
+    </div>
+
+    <!-- 記号ボタン -->
+    <div class="input-section" style="margin-top:8px;">
+      <div class="section-label">② きごうをえらぼう</div>
+      <div class="btn-row" id="opButtons"></div>
+    </div>
+
+    <!-- 式 -->
+    <div class="formula-area" id="formulaArea">
+      <span class="f-placeholder">ボタンをおして式をつくろう</span>
+    </div>
+
+    <!-- フィードバック -->
+    <div class="feedback" id="feedback"></div>
+
+    <!-- アクションバー -->
+    <div class="action-row">
+      <button class="btn-reset" id="resetBtn">↩ やりなおす</button>
+      <button class="btn-hint"  id="hintBtn">💡 ヒント</button>
+      <button class="btn-check" id="checkBtn" disabled>✓ こたえあわせ</button>
+      <button class="btn-next"  id="nextBtn">つぎへ ▶</button>
+    </div>
+
+    <!-- 紙吹雪 -->
+    <div class="confetti-wrap" id="confettiWrap"></div>
+
+    <!-- 5連続お祝い -->
+    <div class="celebrate-overlay" id="celebrateOverlay">
+      <div class="celebrate-emoji">🎉</div>
+      <div class="celebrate-msg">5れんせい<br>たっせい！</div>
+      <div class="celebrate-sub" id="celebrateSub">おめでとう！がんばったね！</div>
+      <button class="celebrate-btn" id="celebrateBtn">つぎへすすむ ▶</button>
+    </div>
+  </div>
+
+  <script>
+    // ===== ゲームロジック =====
+    const OPERATORS = ['+', '−', '×', '÷'];
+    const CC = ['c0','c1','c2','c3'];
+
+    function permutations(arr) {
+      if (arr.length <= 1) return [arr.slice()];
+      return arr.flatMap((v,i) => {
+        const rest = [...arr.slice(0,i), ...arr.slice(i+1)];
+        return permutations(rest).map(p => [v, ...p]);
+      });
+    }
+    function applyOp(a, op, b) {
+      if (op==='+') return a+b;
+      if (op==='−') return a-b;
+      if (op==='×') return a*b;
+      if (op==='÷') return b===0 ? null : a/b;
+      return null;
+    }
+    function evalFormula(nums, ops) {
+      let r = nums[0];
+      for (let i=0; i<ops.length; i++) {
+        r = applyOp(r, ops[i], nums[i+1]);
+        if (r===null) return null;
+      }
+      return r;
+    }
+    function findSolution(numbers) {
+      for (const perm of permutations(numbers))
+        for (const o1 of OPERATORS)
+          for (const o2 of OPERATORS)
+            for (const o3 of OPERATORS) {
+              const r = evalFormula(perm, [o1,o2,o3]);
+              if (r!==null && Math.abs(r-10)<0.001) return { nums:perm.slice(), ops:[o1,o2,o3] };
+            }
+      return null;
+    }
+    function generateProblem(diff) {
+      for (let a=0; a<200; a++) {
+        const nums = Array.from({length:4}, () =>
+          Math.floor(Math.random() * (diff==='easy'?5:10)) + (diff==='easy'?1:0)
+        );
+        const sol = findSolution(nums);
+        if (!sol) continue;
+        if (diff==='hard' && !sol.ops.some(o=>o==='×'||o==='÷')) continue;
+        if (diff==='easy') {
+          let es = null;
+          outer: for (const p of permutations(nums))
+            for (const o1 of ['+','−'])
+              for (const o2 of ['+','−'])
+                for (const o3 of ['+','−']) {
+                  const r = evalFormula(p,[o1,o2,o3]);
+                  if (r!==null && Math.abs(r-10)<0.001) { es={nums:p.slice(),ops:[o1,o2,o3]}; break outer; }
+                }
+          if (!es) continue;
+          return { numbers:nums, hint:es };
+        }
+        return { numbers:nums, hint:sol };
+      }
+      const f=[1,2,3,4]; return { numbers:f, hint:findSolution(f) };
+    }
+
+    // ===== 状態 =====
+    const S = {
+      numbers:[], hint:null, formula:[], used:new Set(),
+      phase:'num', solved:false, combo:0, muted:false,
+      difficulty:'easy', fbKind:null,
+    };
+
+    // ===== 音声 =====
+    let audioCtx = null;
+    function getCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      return audioCtx;
+    }
+    function playTone(freq,dur,gain=0.3,type='sine',delay=0) {
+      if (S.muted) return;
+      setTimeout(() => {
+        const ctx=getCtx(), osc=ctx.createOscillator(), g=ctx.createGain();
+        osc.type=type; osc.frequency.value=freq;
+        g.gain.setValueAtTime(gain, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime+dur);
+      }, delay);
+    }
+    function playNoise(freq,gain,dur) {
+      if (S.muted) return;
+      const ctx=getCtx(), buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);
+      const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+      const src=ctx.createBufferSource(), f=ctx.createBiquadFilter(), g=ctx.createGain();
+      src.buffer=buf; f.type='bandpass'; f.frequency.value=freq;
+      g.gain.setValueAtTime(gain, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+      src.connect(f); f.connect(g); g.connect(ctx.destination);
+      src.start(); src.stop(ctx.currentTime+dur);
+    }
+    function playClick()   { playNoise(1800,0.15,0.04); }
+    function playCorrect() {
+      [523,659,784,1047].forEach((f,i) => playTone(f,0.28,0.32,'sine',i*70));
+      setTimeout(() => playNoise(1200,0.2,0.12), 300);
+    }
+    function playWrong()   { playTone(200,0.3,0.35,'sawtooth'); setTimeout(() => playTone(180,0.3,0.28,'sawtooth'),180); }
+    function playHint()    { playTone(880,0.18,0.2,'sine'); setTimeout(() => playTone(1100,0.18,0.2,'sine'),160); }
+
+    // ===== マスコット =====
+    function mascotHappy() {
+      document.getElementById('mascotBody').style.transform = 'scale(1.15) rotate(-8deg)';
+      document.getElementById('eyeL').style.height = '1px';
+      document.getElementById('eyeR').style.height = '1px';
+      document.getElementById('mouth').style.width  = '18px';
+      document.getElementById('mouth').style.height = '9px';
+      setTimeout(() => {
+        document.getElementById('mascotBody').style.transform = '';
+        document.getElementById('eyeL').style.height = '5px';
+        document.getElementById('eyeR').style.height = '5px';
+        document.getElementById('mouth').style.width  = '12px';
+        document.getElementById('mouth').style.height = '6px';
+      }, 900);
+    }
+    function mascotSad() {
+      document.getElementById('mascotBody').style.transform = 'scale(0.88)';
+      setTimeout(() => document.getElementById('mascotBody').style.transform = '', 500);
+    }
+
+    // ===== 紙吹雪 =====
+    const CONF_COLORS = ['var(--col-a)','var(--col-b)','var(--col-c)','var(--col-d)','var(--col-op)','#fff'];
+    function launchConfetti() {
+      const wrap = document.getElementById('confettiWrap');
+      wrap.innerHTML = '';
+      for (let i=0; i<40; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        const sz = 6 + Math.random()*8;
+        el.style.cssText = `
+          left:${Math.random()*100}%;
+          width:${sz}px; height:${sz*0.4}px;
+          background:${CONF_COLORS[i%CONF_COLORS.length]};
+          transform:rotate(${Math.random()*360}deg);
+          animation:confetti-fall ${1.4+Math.random()*1.2}s ${Math.random()*0.35}s ease-in forwards;
+        `;
+        wrap.appendChild(el);
+      }
+    }
+
+    // ===== レンダリング =====
+    function renderTicket() {
+      document.getElementById('ticketNumbers').innerHTML =
+        S.numbers.map((n,i) => `<div class="num-card ${CC[i]} ${S.used.has(i)?'used':''}">${n}</div>`).join('');
+    }
+    function renderNumButtons() {
+      document.getElementById('numButtons').innerHTML =
+        S.numbers.map((n,i) => {
+          const dis = S.used.has(i) || S.phase!=='num' || S.solved;
+          return `<button class="btn-num ${CC[i]}" data-idx="${i}" ${dis?'disabled':''}>${n}</button>`;
+        }).join('');
+    }
+    function renderOpButtons() {
+      const dis = S.phase!=='op' || S.solved;
+      document.getElementById('opButtons').innerHTML =
+        OPERATORS.map(op => `<button class="btn-op" data-op="${op}" ${dis?'disabled':''}>${op}</button>`).join('');
+    }
+    function renderFormula() {
+      const fa = document.getElementById('formulaArea');
+      if (S.formula.length === 0) {
+        fa.innerHTML = '<span class="f-placeholder">ボタンをおして式をつくろう</span>';
+        return;
+      }
+      const nums = S.formula.filter(f=>f.type==='num').map(f=>f.value);
+      const ops  = S.formula.filter(f=>f.type==='op').map(f=>f.value);
+      let html = S.formula.map(item =>
+        item.type==='num'
+          ? `<span class="f-num ${CC[item.idx]}">${item.value}</span>`
+          : `<span class="f-op">${item.value}</span>`
+      ).join('');
+      if (nums.length>=2 && ops.length>=1) {
+        const r = evalFormula(nums, ops);
+        if (r!==null) {
+          const d = Number.isInteger(r) ? r : r.toFixed(2);
+          html += `<span class="f-result">＝${d}</span>`;
+        }
+      }
+      fa.innerHTML = html;
+    }
+    function renderStars() {
+      document.querySelectorAll('.star').forEach((s,i) => {
+        const lit = i < Math.min(S.combo, 5);
+        s.classList.toggle('lit', lit);
+        s.textContent = lit ? '★' : '';
+      });
+    }
+    function renderActions() {
+      const check = document.getElementById('checkBtn');
+      const next  = document.getElementById('nextBtn');
+      if (S.solved || S.fbKind==='wrong') {
+        check.style.display = 'none';
+        next.classList.add('show');
+      } else {
+        check.style.display = '';
+        check.disabled = S.formula.length < 7;
+        next.classList.remove('show');
+      }
+    }
+    function render() {
+      renderTicket(); renderNumButtons(); renderOpButtons();
+      renderFormula(); renderStars(); renderActions();
+    }
+
+    // ===== ゲーム操作 =====
+    function startNew() {
+      const p = generateProblem(S.difficulty);
+      Object.assign(S, { numbers:p.numbers, hint:p.hint, formula:[], used:new Set(), phase:'num', solved:false, fbKind:null });
+      const fb = document.getElementById('feedback');
+      fb.textContent = ''; fb.className = 'feedback';
+      render();
+    }
+    function selectNum(idx) {
+      if (S.phase!=='num' || S.used.has(idx) || S.solved) return;
+      S.formula.push({ type:'num', value:S.numbers[idx], idx });
+      S.used.add(idx);
+      S.phase = S.used.size===4 ? 'done' : 'op';
+      playClick(); render();
+    }
+    function selectOp(op) {
+      if (S.phase!=='op' || S.solved) return;
+      S.formula.push({ type:'op', value:op });
+      S.phase = 'num';
+      playClick(); render();
+    }
+    function reset() {
+      Object.assign(S, { formula:[], used:new Set(), phase:'num', solved:false, fbKind:null });
+      const fb = document.getElementById('feedback');
+      fb.textContent = ''; fb.className = 'feedback';
+      render();
+    }
+    function check() {
+      if (S.formula.length < 7) return;
+      const nums = S.formula.filter(f=>f.type==='num').map(f=>f.value);
+      const ops  = S.formula.filter(f=>f.type==='op').map(f=>f.value);
+      const r    = evalFormula(nums, ops);
+      const fb   = document.getElementById('feedback');
+      if (r!==null && Math.abs(r-10)<0.001) {
+        fb.textContent = '🎊 せいかい！すごい！🎊';
+        fb.className = 'feedback correct';
+        S.solved=true; S.combo++; S.fbKind='correct';
+        playCorrect(); mascotHappy(); launchConfetti();
+        const g = document.getElementById('game');
+        g.classList.remove('celebrating'); void g.offsetWidth; g.classList.add('celebrating');
+        setTimeout(() => g.classList.remove('celebrating'), 800);
+        if (S.combo >= 5) setTimeout(showCelebration, 900);
+      } else {
+        const disp = r===null ? '？' : (Number.isInteger(r) ? r : r.toFixed(2));
+        const h = S.hint;
+        const ex = h ? `${h.nums[0]}${h.ops[0]}${h.nums[1]}${h.ops[1]}${h.nums[2]}${h.ops[2]}${h.nums[3]}=10` : '';
+        fb.innerHTML = `ざんねん…（こたえ: ${disp}）<br><span style="font-size:11px;opacity:0.8">れい: ${ex}</span>`;
+        fb.className = 'feedback wrong';
+        S.combo=0; S.fbKind='wrong';
+        playWrong(); mascotSad();
+      }
+      renderStars(); renderActions();
+    }
+
+    // ===== 5連続お祝い =====
+    const CELEBRATE_MSGS = ['がんばったね！', 'すごいじゃん！', 'さすが！', 'てんさいかも！'];
+    function showCelebration() {
+      const overlay = document.getElementById('celebrateOverlay');
+      document.getElementById('celebrateSub').textContent =
+        CELEBRATE_MSGS[Math.floor(Math.random() * CELEBRATE_MSGS.length)];
+      overlay.classList.add('show');
+      launchConfetti();
+      [523,659,784,880,1047].forEach((f,i) => playTone(f, 0.4, 0.28, 'sine', i*100));
+    }
+    function hideCelebration() {
+      document.getElementById('celebrateOverlay').classList.remove('show');
+      S.combo = 0;
+      renderStars();
+      startNew();
+    }
+    document.getElementById('celebrateBtn').addEventListener('click', hideCelebration);
+
+    function hint() {
+      if (!S.hint) return;
+      const fb = document.getElementById('feedback');
+      fb.textContent = `💡 「${S.hint.nums[0]} ${S.hint.ops[0]}」からはじめよう！`;
+      fb.className = 'feedback hint';
+      playHint();
+    }
+
+    // ===== イベント =====
+    document.getElementById('numButtons').addEventListener('click', e => {
+      const b = e.target.closest('[data-idx]'); if (b) selectNum(Number(b.dataset.idx));
+    });
+    document.getElementById('opButtons').addEventListener('click', e => {
+      const b = e.target.closest('[data-op]'); if (b) selectOp(b.dataset.op);
+    });
+    document.getElementById('resetBtn').addEventListener('click', reset);
+    document.getElementById('hintBtn').addEventListener('click', hint);
+    document.getElementById('checkBtn').addEventListener('click', check);
+    document.getElementById('nextBtn').addEventListener('click', startNew);
+
+    document.querySelectorAll('.diff-btn[data-diff]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        S.difficulty = btn.dataset.diff; S.combo = 0;
+        document.querySelectorAll('.diff-btn[data-diff]').forEach(b => {
+          b.classList.remove('active','easy','normal','hard');
+        });
+        btn.classList.add('active', btn.dataset.diff);
+        startNew();
+      });
+    });
+
+    document.getElementById('muteBtn').addEventListener('click', () => {
+      S.muted = !S.muted;
+      document.getElementById('muteBtn').textContent = S.muted ? '🔇' : '🔊';
+    });
+    document.addEventListener('click', () => {
+      if (!S.muted && audioCtx?.state==='suspended') audioCtx.resume();
+    }, { once: true });
+
+    // ===== 起動 =====
+    startNew();
+  </script>
+</body>
+</html>
